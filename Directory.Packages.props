@@ -33,7 +33,7 @@
     <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.10" />
     <!-- Release 2 (ADR-0008): Hangfire activated for F6.2 (envío de correo asíncrono). -->
     <PackageVersion Include="Hangfire.AspNetCore" Version="1.8.14" />
-    <PackageVersion Include="Hangfire.SqlServer" Version="1.8.14" />
+    <PackageVersion Include="Hangfire.SqlServer" Version="1.8.23" />
     <!-- Release 2 (F5, ADR-0009): los 4 SDKs reales de proveedores de Documentos —
          intercambiables por configuración, uno activo por instancia (DependencyInjection.cs). -->
     <PackageVersion Include="Azure.Storage.Blobs" Version="12.22.2" />

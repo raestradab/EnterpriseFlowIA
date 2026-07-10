@@ -36,7 +36,7 @@
     <PackageVersion Include="Hangfire.SqlServer" Version="1.8.14" />
     <!-- Release 2 (F5, ADR-0009): los 4 SDKs reales de proveedores de Documentos —
          intercambiables por configuración, uno activo por instancia (DependencyInjection.cs). -->
-    <PackageVersion Include="Azure.Storage.Blobs" Version="12.22.2" />
+    <PackageVersion Include="Azure.Storage.Blobs" Version="12.29.1" />
     <PackageVersion Include="AWSSDK.S3" Version="3.7.412.1" />
     <PackageVersion Include="Google.Cloud.Storage.V1" Version="4.10.0" />
     <!-- Release 3 (F9/F10, ADR-0013): SDK oficial de OpenAI (chat + embeddings). Anthropic no

@@ -9,7 +9,7 @@
     <PackageVersion Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
 
     <!-- Application -->
-    <PackageVersion Include="MediatR" Version="12.4.1" />
+    <PackageVersion Include="MediatR" Version="14.2.0" />
     <PackageVersion Include="FluentValidation" Version="11.10.0" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="11.10.0" />
     <!-- Lean, framework-independent package for IDistributedCache only (CachingBehavior,
@@ -22,7 +22,7 @@
     <!-- Lean, framework-independent package for ILogger<T> only (IndexDocumentOnUploadHandler,
          Release 3 Sprint 7b) — first place Application needs to log a caught exception instead
          of silently swallowing it; same reasoning as the caching/options abstractions above. -->
-    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
 
     <!-- Infrastructure -->
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="8.0.10" />

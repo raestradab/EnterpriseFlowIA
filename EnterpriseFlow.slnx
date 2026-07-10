@@ -1,0 +1,19 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/EnterpriseFlow.Api/EnterpriseFlow.Api.csproj" />
+    <Project Path="src/EnterpriseFlow.Application/EnterpriseFlow.Application.csproj" />
+    <Project Path="src/EnterpriseFlow.Domain/EnterpriseFlow.Domain.csproj" />
+    <Project Path="src/EnterpriseFlow.Infrastructure/EnterpriseFlow.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/EnterpriseFlow.Api.IntegrationTests/EnterpriseFlow.Api.IntegrationTests.csproj" />
+    <Project Path="tests/EnterpriseFlow.Application.UnitTests/EnterpriseFlow.Application.UnitTests.csproj" />
+    <Project Path="tests/EnterpriseFlow.Architecture.Tests/EnterpriseFlow.Architecture.Tests.csproj" />
+    <Project Path="tests/EnterpriseFlow.Domain.UnitTests/EnterpriseFlow.Domain.UnitTests.csproj" />
+    <Project Path="tests/EnterpriseFlow.Infrastructure.UnitTests/EnterpriseFlow.Infrastructure.UnitTests.csproj" />
+    <Project Path="tests/EnterpriseFlow.Infrastructure.SqlServerTests/EnterpriseFlow.Infrastructure.SqlServerTests.csproj" />
+  </Folder>
+  <Folder Name="/benchmarks/">
+    <Project Path="benchmarks/EnterpriseFlow.Benchmarks/EnterpriseFlow.Benchmarks.csproj" />
+  </Folder>
+</Solution>

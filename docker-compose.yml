@@ -1,0 +1,95 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${SA_PASSWORD}
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    healthcheck:
+      # Tries mssql-tools18 first (current images ship it, needs -C to trust the self-signed
+      # cert since it encrypts by default) and falls back to the older mssql-tools path — not
+      # verified against a pulled image in this environment (no Docker daemon available here),
+      # so this hedges against the exact bundled path changing between image revisions.
+      test: >-
+        CMD-SHELL
+        /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$$SA_PASSWORD" -C -Q "SELECT 1" ||
+        /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "$$SA_PASSWORD" -Q "SELECT 1" ||
+        exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  # Release 2 (ADR-0008): backs CachingBehavior/CacheInvalidationBehavior for Catálogos
+  # (F8.2) — no password for a local/demo stack; Infrastructure.DependencyInjection falls back
+  # to an in-process cache if Redis__ConnectionString is absent, so this service is additive,
+  # not load-bearing for the stack to start.
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  api:
+    build:
+      context: .
+      dockerfile: src/EnterpriseFlow.Api/Dockerfile
+    environment:
+      # Development, not Production: this compose stack has no TLS termination in front of it —
+      # HSTS (Production-only, see Program.cs) would be actively wrong here, and keeping Swagger
+      # on is genuinely useful for exploring a portfolio project's API, which is this stack's
+      # actual purpose (a demo/local environment, not a hardened deployment target).
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      # "sqlserver" (the compose service name), not "localhost" — appsettings.json's checked-in
+      # default targets a host-reachable SQL Server (e.g. this same stack's published 1433 port
+      # from outside Docker), which isn't the same address from inside the api container's
+      # network namespace.
+      ConnectionStrings__Default: Server=sqlserver,1433;Database=EnterpriseFlow;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True
+      # Release 2 (ADR-0008): the *same* database as ConnectionStrings__Default, not a separate
+      # one — `UseSqlServerStorage` creates Hangfire's own ~10 tables inside whatever database
+      # it connects to, but (unlike EF migrations) never creates the database itself. A separate
+      # "EnterpriseFlowHangfire" database would need its own creation step this stack doesn't
+      # have (found the hard way in Sprint 3: Hangfire failed outright against a database that
+      # didn't exist yet, see r2-03-arquitectura.md); reusing the app's own database sidesteps
+      # that entirely, since Program.cs's Database.Migrate() already creates it on first run.
+      # Backs F6.2 (envío de correo asíncrono); see Infrastructure.DependencyInjection for why
+      # this is entirely skipped, not pointed at a fake value, when unset.
+      ConnectionStrings__Hangfire: Server=sqlserver,1433;Database=EnterpriseFlow;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True
+      Redis__ConnectionString: redis:6379
+      # The signing key deliberately isn't in appsettings.json (security review finding, see
+      # docs/08a-seguridad.md) — supplied here from .env instead, same as SA_PASSWORD.
+      Jwt__SigningKey: ${JWT_SIGNING_KEY}
+      # F5 (ADR-0009): LocalStorageProvider is the default and only Documents:Provider this
+      # stack configures — the other three (AzureBlob/S3/Gcs) need a real cloud account this
+      # local/demo stack deliberately doesn't assume; see r2-07b-backend-documentos.md for the
+      # same disclosure made when they were built. SMTP (F6.2) is left unconfigured for the same
+      # reason — no real mail server here — so IEmailQueue resolves to the no-op NullEmailQueue.
+      Documents__Local__BasePath: /app/documents
+      # Release 3 (F9/F10, ADR-0013): same reasoning as Documents/SMTP above — Ai:ChatProvider
+      # and Ai:EmbeddingProvider are left unset because OpenAI/Anthropic need a real API key this
+      # local/demo stack doesn't assume. IAiChatClient/IEmbeddingClient resolve to the no-op
+      # NullAiChatClient/NullEmbeddingClient; the assistant stays reachable and answers
+      # gracefully instead of failing. Set Ai__ChatProvider=openai (or anthropic) plus
+      # Ai__OpenAi__ApiKey/Ai__Anthropic__ApiKey in .env to use a real provider.
+    volumes:
+      - documents-data:/app/documents
+    ports:
+      - "5050:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ./src/EnterpriseFlow.Web
+    ports:
+      - "8081:80"
+    depends_on:
+      - api
+
+volumes:
+  sqlserver-data:
+  documents-data:

@@ -1,0 +1,15 @@
+**/bin/
+**/obj/
+**/node_modules/
+**/dist/
+.git/
+.vs/
+.vscode/
+.idea/
+.claude/
+coverage-results/
+coverage-report/
+*.log
+docs/
+tests/
+src/EnterpriseFlow.Web/

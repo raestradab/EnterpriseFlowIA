@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\EnterpriseFlow.Application\EnterpriseFlow.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Needed for IHttpContextAccessor used by the (temporary, header-based) current
+         tenant/user services — see Identity/. Not a NuGet package since ASP.NET Core 3+. -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" />
+    <!-- Only IPublisher is used (dispatching domain events after SaveChanges) — Infrastructure
+         does not register handlers or send commands, that stays in Application/Api. -->
+    <PackageReference Include="MediatR" />
+    <!-- Release 2 (ADR-0008/ADR-0012): real IDistributedCache backing Redis. Falls back to
+         AddDistributedMemoryCache() when Redis:ConnectionString isn't configured (Testing, or
+         local dev without Redis running) — see DependencyInjection.cs. -->
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" />
+    <!-- Release 2 (ADR-0008): background job processing for F6.2 (envío de correo asíncrono).
+         SQL Server as storage, not a new piece of infrastructure — reuses the existing database. -->
+    <PackageReference Include="Hangfire.AspNetCore" />
+    <PackageReference Include="Hangfire.SqlServer" />
+    <!-- Release 2 (F5, ADR-0009): un SDK real por proveedor de Documentos intercambiable. -->
+    <PackageReference Include="Azure.Storage.Blobs" />
+    <PackageReference Include="AWSSDK.S3" />
+    <PackageReference Include="Google.Cloud.Storage.V1" />
+    <!-- Release 3 (F9/F10, ADR-0013): SDK oficial de OpenAI. AnthropicChatClient no usa paquete
+         — implementado contra la REST API directamente (ver Ai/AnthropicChatClient.cs). -->
+    <PackageReference Include="OpenAI" />
+    <!-- Release 3 (F10.2, HU-100): extracción de texto de PDF/Word para RAG. -->
+    <PackageReference Include="PdfPig" />
+    <PackageReference Include="DocumentFormat.OpenXml" />
+    <!-- Release 4 (F7.5, ADR-0016): tracing distribuido. -->
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" />
+    <PackageReference Include="OpenTelemetry.Exporter.Console" />
+    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" />
+  </ItemGroup>
+
+</Project>

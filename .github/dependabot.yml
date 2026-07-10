@@ -1,0 +1,22 @@
+version: 2
+updates:
+  # Directory.Packages.props (central package management) — Dependabot resolves versions from
+  # there even though the .csproj files themselves only have bare <PackageReference Include="..."/>.
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+
+  - package-ecosystem: "npm"
+    directory: "/src/EnterpriseFlow.Web"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+
+  # The workflow files themselves (actions/checkout, actions/setup-dotnet, github/codeql-action,
+  # etc.) pin major versions — Dependabot is what actually keeps those current.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

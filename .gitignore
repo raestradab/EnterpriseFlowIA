@@ -1,0 +1,39 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+
+## Test results
+[Tt]est[Rr]esult*/
+coverage*.json
+coverage*.xml
+coverage*.info
+coverage-results/
+coverage-report/
+
+## Frontend (Release 1, Sprint 8)
+node_modules/
+dist/
+.vite/
+
+## IDE
+.vs/
+.vscode/
+*.rider.json
+.idea/
+
+## Claude Code local session state — machine/session-specific, not project source
+.claude/
+
+## Secrets / local config
+appsettings.*.local.json
+.env
+.env.*
+!.env.example
+
+## Stray local run output
+*.log
+
+## BenchmarkDotNet (Release 4, F12.4) — generated per run, never source
+BenchmarkDotNet.Artifacts/

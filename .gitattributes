@@ -1,0 +1,18 @@
+# Normalize line endings on checkin regardless of the contributor's platform/git config —
+# avoids the repo silently accumulating mixed CRLF/LF and noisy whole-file diffs later.
+* text=auto
+
+*.cs text diff=csharp
+*.ts text
+*.vue text
+*.json text
+*.md text
+
+*.png binary
+*.jpg binary
+*.ico binary
+*.svg text
+*.woff2 binary
+*.woff binary
+*.ttf binary
+*.eot binary

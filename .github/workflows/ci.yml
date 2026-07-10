@@ -1,0 +1,103 @@
+name: CI
+
+"on":
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  backend:
+    name: Backend (lint · build · test)
+    runs-on: ubuntu-latest
+    # Release 4, Sprint 11: backs EnterpriseFlow.Infrastructure.SqlServerTests (Sprint 9) — a
+    # Linux SQL Server container, not LocalDB (Windows-only, what local dev machines use
+    # instead). MSSQL_SA_PASSWORD is a throwaway credential for an ephemeral CI-only database
+    # that never leaves this job — not a real secret, so it isn't stored as one.
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: "Y"
+          MSSQL_SA_PASSWORD: "CiOnly_Test_Passw0rd!"
+        ports:
+          - 1433:1433
+        options: >-
+          --health-cmd="/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P $MSSQL_SA_PASSWORD -Q 'SELECT 1'"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore EnterpriseFlow.slnx
+
+      # Whitespace/naming-style/StyleCop consistency per .editorconfig — a genuine, separate
+      # concern from "does it compile": TreatWarningsAsErrors (Directory.Build.props) already
+      # fails the build on any analyzer warning, but that's the *build*, not a formatting check
+      # (dotnet format catches drift the compiler itself doesn't, e.g. .editorconfig
+      # indentation/naming-style violations that don't produce a compiler diagnostic at all).
+      - name: Lint (dotnet format)
+        run: dotnet format EnterpriseFlow.slnx --verify-no-changes --no-restore
+
+      - name: Build
+        run: dotnet build EnterpriseFlow.slnx --no-restore --configuration Release
+
+      # EnterpriseFlow.Infrastructure.SqlServerTests (Sprint 9) now runs for real against the
+      # `sqlserver` service above — no more "Category!=RequiresSqlServer" filter (Sprint 9-10
+      # only had that filter because no SQL Server was reachable in CI yet). Database name
+      # matches the fixture's own default so nothing needs overriding beyond the connection
+      # string itself.
+      - name: Test
+        env:
+          SQLSERVERTESTS_CONNECTION_STRING: "Server=localhost,1433;Database=EnterpriseFlow_SqlServerTests;User Id=sa;Password=CiOnly_Test_Passw0rd!;TrustServerCertificate=True"
+        run: >
+          dotnet test EnterpriseFlow.slnx --no-build --configuration Release
+          --settings coverlet.runsettings --collect:"XPlat Code Coverage"
+          --results-directory ./coverage-results
+
+      # Release 4, Sprint 9 (F12.3): the aggregate line coverage has been >=90% since Release 3
+      # Sprint 9 (r3-09-pruebas.md), but nothing enforced it going forward — a future PR could
+      # silently regress below the target. reportgenerator isn't a repo-local tool (no
+      # .config/dotnet-tools.json in this project), so it's installed fresh in CI rather than
+      # adding a manifest just for one CI-only step.
+      - name: Coverage report
+        run: |
+          dotnet tool install -g dotnet-reportgenerator-globaltool
+          reportgenerator -reports:"coverage-results/**/coverage.cobertura.xml" -targetdir:"coverage-report" -reporttypes:"TextSummary"
+          cat coverage-report/Summary.txt
+
+      - name: Enforce coverage gate (line coverage >= 90%, F12.3)
+        run: |
+          LINE_COVERAGE=$(grep -oP 'Line coverage: \K[0-9.]+' coverage-report/Summary.txt)
+          echo "Aggregate line coverage: ${LINE_COVERAGE}%"
+          awk -v cov="$LINE_COVERAGE" 'BEGIN { exit !(cov + 0 >= 90) }' \
+            || { echo "Coverage ${LINE_COVERAGE}% is below the 90% gate (F12.3)."; exit 1; }
+
+  frontend:
+    name: Frontend (typecheck · build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/EnterpriseFlow.Web
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: src/EnterpriseFlow.Web/package-lock.json
+
+      # --legacy-peer-deps: documented debt (docs/08-frontend.md) — vue-router@5's
+      # peerDependencies want a newer Vite than the ^6.3.5 pinned here.
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      # vue-tsc -b (typecheck — this project's "lint") && vite build, both defined in package.json.
+      - name: Typecheck and build
+        run: npm run build

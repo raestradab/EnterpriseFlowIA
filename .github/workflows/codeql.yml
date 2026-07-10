@@ -1,0 +1,48 @@
+name: "CodeQL"
+
+"on":
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Weekly, not just on push/PR — dependency-only vulnerabilities (a new CVE published against
+    # a package already in the repo) need a scan even when no code changed.
+    - cron: "30 1 * * 1"
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        # F13.3 (Release 4): CodeQL over SonarCloud/SonarQube — native to GitHub Actions, no
+        # external account/token to configure (r4-01-vision-y-alcance.md, sección 3). Both
+        # languages this repo actually has: EnterpriseFlow.slnx (C#) and
+        # src/EnterpriseFlow.Web (TypeScript/Vue).
+        language: ["csharp", "javascript-typescript"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+
+      # C# is compiled — CodeQL needs a real build to extract from, not just source text.
+      # javascript-typescript needs none (CodeQL parses .ts/.vue directly).
+      - if: matrix.language == 'csharp'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - if: matrix.language == 'csharp'
+        run: dotnet build EnterpriseFlow.slnx --configuration Release
+
+      - uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"

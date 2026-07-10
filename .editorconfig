@@ -1,0 +1,109 @@
+root = true
+
+[*]
+indent_style = space
+indent_size = 4
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.{yml,yaml,json}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.cs]
+indent_size = 4
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+csharp_using_directive_placement = outside_namespace:error
+
+# Nombres: PascalCase para tipos y miembros públicos, _camelCase para campos privados mutables.
+# private const / static readonly se tratan como constantes (PascalCase, sin prefijo) — más
+# específicas que la regla general de abajo, así que Roslyn las prioriza para esos casos (ya era
+# la convención de facto en AppDbContext.SetGlobalQueryFilterMethodInfo antes de escribirse aquí).
+dotnet_naming_symbols.private_constants.applicable_kinds = field
+dotnet_naming_symbols.private_constants.applicable_accessibilities = private
+dotnet_naming_symbols.private_constants.required_modifiers = const
+dotnet_naming_symbols.private_static_readonly_fields.applicable_kinds = field
+dotnet_naming_symbols.private_static_readonly_fields.applicable_accessibilities = private
+dotnet_naming_symbols.private_static_readonly_fields.required_modifiers = static, readonly
+dotnet_naming_style.pascal_case_style.capitalization = pascal_case
+
+dotnet_naming_rule.private_constants_pascal_case.symbols = private_constants
+dotnet_naming_rule.private_constants_pascal_case.style = pascal_case_style
+dotnet_naming_rule.private_constants_pascal_case.severity = warning
+
+dotnet_naming_rule.private_static_readonly_pascal_case.symbols = private_static_readonly_fields
+dotnet_naming_rule.private_static_readonly_pascal_case.style = pascal_case_style
+dotnet_naming_rule.private_static_readonly_pascal_case.severity = warning
+
+dotnet_naming_rule.private_fields_underscore.symbols = private_fields
+dotnet_naming_rule.private_fields_underscore.style = underscore_prefix
+dotnet_naming_rule.private_fields_underscore.severity = warning
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+dotnet_naming_style.underscore_prefix.capitalization = camel_case
+dotnet_naming_style.underscore_prefix.required_prefix = _
+
+# Preferencias de lenguaje
+csharp_style_var_for_built_in_types = false:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_namespace_declarations = file_scoped:error
+dotnet_style_require_accessibility_modifiers = for_non_interface_members:warning
+dotnet_style_qualification_for_field = false:suggestion
+
+# Nulabilidad y estilo funcional
+csharp_style_prefer_null_check_over_type_check = true:suggestion
+dotnet_diagnostic.CS8618.severity = error
+
+# StyleCop: desactivar reglas que contradicen las convenciones ya elegidas arriba
+# (campos privados _camelCase, sin prefijo "this.", sin headers de archivo/XML docs obligatorios).
+dotnet_diagnostic.SA1633.severity = none
+dotnet_diagnostic.SA1101.severity = none
+dotnet_diagnostic.SA1309.severity = none
+dotnet_diagnostic.SA0001.severity = none
+
+# "Sin XML docs obligatorios" (comentario de arriba) nunca se había configurado realmente — solo
+# quedaba así porque `dotnet build` no corre el fixer "analyzers" de `dotnet format` con la misma
+# severidad, así que la ausencia de docs nunca fallaba el build pero sí `dotnet format --verify-
+# no-changes`. Sprint 11 (DevOps): alineado explícitamente aquí porque CI ahora corre ese comando.
+dotnet_diagnostic.SA1600.severity = none
+dotnet_diagnostic.SA1601.severity = none
+dotnet_diagnostic.SA1602.severity = none
+dotnet_diagnostic.SA1611.severity = none
+dotnet_diagnostic.SA1615.severity = none
+dotnet_diagnostic.SA1618.severity = none
+
+# CA1305 (IFormatProvider) is a globalization rule not relevant to console/file logging
+# sink configuration; "latest-recommended" flags Serilog's LoggerSinkConfiguration overloads.
+dotnet_diagnostic.CA1305.severity = none
+
+# CA1711 reserves the "...Permission" suffix for types derived from the legacy CAS
+# System.Security.Permissions.CodeAccessPermission model, which this codebase does not use.
+# Our "Permission" here means an authorization permission string (ADR-0004) — an unrelated,
+# modern concept that legitimately deserves the name.
+dotnet_diagnostic.CA1711.severity = none
+
+# CA1707 (no underscores in identifiers) is intentionally off: test method names use the
+# Method_Scenario_Expected convention throughout tests/, which is far more readable in test
+# output than a single PascalCase run-on sentence. No production (non-test) code uses
+# underscored names, so this doesn't relax anything outside of tests.
+dotnet_diagnostic.CA1707.severity = none
+
+# SA1402 (single type per file) is off for Application: Vertical Slice files deliberately
+# co-locate a Command/Query with its small Result/Dto record (e.g. LoginCommand +
+# LoginResult) — splitting them into separate files would scatter one cohesive unit of code
+# across two files for no readability benefit.
+dotnet_diagnostic.SA1402.severity = none
+
+[*.{ts,vue,js}]
+indent_size = 2
+quote_type = single
+
+[*.{csproj,props,targets}]
+indent_size = 2

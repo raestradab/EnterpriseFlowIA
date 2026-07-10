@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat code coverage">
+        <Configuration>
+          <!--
+            EF Core migrations are generated code (every column/index of every table, regenerated
+            by `dotnet ef migrations add`, never hand-edited) — asserting coverage on them adds
+            no signal, just dead weight against the 90% target. DesignTimeDbContextFactory is
+            excluded via [ExcludeFromCodeCoverage] instead, since it's a single class, not a whole
+            generated folder.
+
+            Release 2, Sprint 9: the three cloud Document storage providers (F5, ADR-0009) and
+            the SMTP email sender (F6.2) wrap real third-party SDK clients (Azure.Storage.Blobs,
+            AWSSDK.S3, Google.Cloud.Storage.V1, System.Net.Mail) that need a real account/server
+            to exercise meaningfully — this environment has none (see r2-07b-backend-documentos.md
+            and r2-07c-backend-notificaciones.md, where this gap was already disclosed at the time
+            each was built). A Moq-based unit test here would only prove "this code calls the SDK
+            method it calls" — it can't verify the actual upload/download/send behavior, which is
+            the part that matters and the part LocalStorageProvider (kept IN the coverage number,
+            100% covered with real disk I/O) already proves the pattern works for. Their sibling
+            Options classes are excluded alongside them for the same reason: they only exist to
+            configure the provider they're paired with.
+
+            Release 3, Sprint 7a/7b: same reasoning for OpenAiChatClient/AnthropicChatClient/
+            OpenAiEmbeddingClient (ADR-0013) — no OpenAI/Anthropic API key in this environment
+            (r3-01-vision-y-alcance.md, sección 0). Their *mapping* logic (OpenAiChatMessageMapper,
+            AnthropicMessageMapper) is deliberately NOT excluded — that's pure, dependency-free
+            translation code, fully unit-tested (EnterpriseFlow.Infrastructure.UnitTests) without
+            needing a real call; only the thin wrapper that actually performs the network call is.
+          -->
+          <Exclude>[EnterpriseFlow.Infrastructure]EnterpriseFlow.Infrastructure.Persistence.Migrations.*,[EnterpriseFlow.Infrastructure]EnterpriseFlow.Infrastructure.Storage.AmazonS3StorageProvider,[EnterpriseFlow.Infrastructure]EnterpriseFlow.Infrastructure.Storage.AzureBlobStorageProvider,[EnterpriseFlow.Infrastructure]EnterpriseFlow.Infrastructure.Storage.GoogleCloudStorageProvider,[EnterpriseFlow.Infrastructure]EnterpriseFlow.Infrastructure.Storage.AzureBlobStorageOptions,[EnterpriseFlow.Infrastructure]EnterpriseFlow.Infrastructure.Storage.S3StorageOptions,[EnterpriseFlow.Infrastructure]EnterpriseFlow.Infrastructure.Storage.GcsStorageOptions,[EnterpriseFlow.Infrastructure]EnterpriseFlow.Infrastructure.Email.SmtpEmailSender,[EnterpriseFlow.Infrastructure]EnterpriseFlow.Infrastructure.Email.SmtpOptions,[EnterpriseFlow.Infrastructure]EnterpriseFlow.Infrastructure.Ai.OpenAiChatClient,[EnterpriseFlow.Infrastructure]EnterpriseFlow.Infrastructure.Ai.AnthropicChatClient,[EnterpriseFlow.Infrastructure]EnterpriseFlow.Infrastructure.Ai.OpenAiEmbeddingClient,[EnterpriseFlow.Infrastructure]EnterpriseFlow.Infrastructure.Ai.OpenAiOptions,[EnterpriseFlow.Infrastructure]EnterpriseFlow.Infrastructure.Ai.AnthropicOptions</Exclude>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

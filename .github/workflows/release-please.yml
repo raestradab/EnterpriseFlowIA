@@ -1,0 +1,22 @@
+name: Release Please
+
+"on":
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    name: Release Please
+    runs-on: ubuntu-latest
+    steps:
+      # F13.5 (Release 4): reads Conventional Commits (CONTRIBUTING.md) since the last release,
+      # keeps a PR open with the computed next SemVer version + CHANGELOG.md entry, and cuts the
+      # tag + GitHub Release with generated notes once that PR is merged.
+      - uses: googleapis/release-please-action@v4
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json

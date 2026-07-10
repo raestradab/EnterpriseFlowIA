@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\EnterpriseFlow.Domain\EnterpriseFlow.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+    <!-- Provider-agnostic EF Core abstractions only (DbSet<T>, IQueryable) — no SqlServer/Design
+         provider package here. Infrastructure owns the concrete provider (ADR-0002 addendum,
+         see EnterpriseFlow.Architecture.Tests for the enforced rule). -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <!-- IDistributedCache only (CachingBehavior, ADR-0012) — not StackExchange.Redis itself,
+         which is a concrete implementation Infrastructure owns. -->
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" />
+    <!-- IOptions<T> only (DocumentValidationOptions, HU-051). -->
+    <PackageReference Include="Microsoft.Extensions.Options" />
+    <!-- ILogger<T> only (IndexDocumentOnUploadHandler, Release 3 Sprint 7b). -->
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+  </ItemGroup>
+
+</Project>

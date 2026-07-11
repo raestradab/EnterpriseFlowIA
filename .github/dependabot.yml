@@ -2,17 +2,28 @@ version: 2
 updates:
   # Directory.Packages.props (central package management) — Dependabot resolves versions from
   # there even though the .csproj files themselves only have bare <PackageReference Include="..."/>.
+  #
+  # `groups` (added after the first real scan opened 21 individual PRs on a repo whose pinned
+  # versions had never been touched — one per outdated package, no batching): one PR per
+  # ecosystem instead, matching a single developer's actual review capacity better than a PR
+  # flood a solo maintainer can't triage in bulk.
   - package-ecosystem: "nuget"
     directory: "/"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
+    groups:
+      nuget-dependencies:
+        patterns: ["*"]
 
   - package-ecosystem: "npm"
     directory: "/src/EnterpriseFlow.Web"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
+    groups:
+      npm-dependencies:
+        patterns: ["*"]
 
   # The workflow files themselves (actions/checkout, actions/setup-dotnet, github/codeql-action,
   # etc.) pin major versions — Dependabot is what actually keeps those current.
@@ -20,3 +31,6 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    groups:
+      github-actions-dependencies:
+        patterns: ["*"]

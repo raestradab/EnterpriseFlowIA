@@ -1,5 +1,8 @@
 # EnterpriseFlow AI
 
+[![CI](https://github.com/raestradab/EnterpriseFlowIA/actions/workflows/ci.yml/badge.svg)](https://github.com/raestradab/EnterpriseFlowIA/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/raestradab/EnterpriseFlowIA/actions/workflows/codeql.yml/badge.svg)](https://github.com/raestradab/EnterpriseFlowIA/actions/workflows/codeql.yml)
+
 Plataforma SaaS multi-tenant de gestión de proyectos, clientes y equipos, con
 un asistente de IA embebido (RAG sobre los Documentos de cada tenant — un
 servidor MCP propio quedó diferido, ver [`docs/backlog/epics.md`](./docs/backlog/epics.md),

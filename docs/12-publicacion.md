@@ -108,11 +108,53 @@ destino con acceso al registro).
    `main`, abre su PR de versión automáticamente; al mergearlo, crea el
    Release, que dispara `publish.yml`.
 
-## Límite de verificación de este documento
+## 7. Verificación real, post-push
 
-Todo lo de arriba está descrito con precisión sobre lo que cada pieza
-hace y por qué, pero **nada de esto corrió todavía contra GitHub real** —
-se escribe antes del primer push, no después de confirmarlo. La sección
-"Verificación" de cada Sprint anterior documentaba corridas reales; esta
-vez, la verificación real ocurre después de este documento, no antes, y
-se registrará en un anexo o commit de seguimiento una vez confirmada.
+`git remote add` + `git push` no salieron limpios al primer intento: el
+repo que se creó en GitHub no estaba vacío — traía un commit *"Initial
+commit"* generado por GitHub agregando un `.gitignore` genérico (429
+líneas, sin relación con este proyecto). `git push` lo rechazó
+(`! [rejected] main -> main (fetch first)`). Confirmado con `git fetch` +
+`git show --stat origin/main` que ese commit no tenía trabajo real —
+decisión explícita del usuario: `git push --force` para reemplazarlo con
+el commit inicial real de este repo, en vez de mergear y terminar con dos
+commits (contradiciendo la preferencia de "un solo commit limpio").
+
+Con el push ya real, se pudo consultar la API pública de GitHub
+(`api.github.com/repos/.../actions/runs`, sin autenticación — funciona
+para repos públicos) para confirmar ejecución real, no solo sintaxis:
+
+- **`CI` y `CodeQL` sobre `main` mismo, en ambos commits pusheados**
+  (`91534aa` inicial y `2dd4b12` del fix de Dependabot): **completed /
+  success**, los dos. `Release Please` también: **completed / success**
+  (sin abrir PR de versión todavía — el primer commit es `chore:`, que no
+  dispara un bump de versión bajo Conventional Commits, comportamiento
+  esperado, no un fallo).
+- **Hallazgo real, no anticipado**: el primer escaneo de Dependabot abrió
+  **21 PRs individuales** (un paquete desactualizado por PR — las
+  versiones fijadas en `Directory.Packages.props`/`package.json` nunca se
+  habían tocado desde que se fijaron). Cada PR disparó `ci.yml` y
+  `codeql.yml` (ambos con `pull_request:` sin filtro de rama, correcto en
+  sí — cualquier PR real debe validarse), generando 30+ corridas en cola
+  de golpe. Corregido agregando `groups:` a `dependabot.yml` (una PR por
+  ecosistema, no por paquete) — verificado que funcionó de verdad:
+  Dependabot cerró los 21 PRs individuales por su cuenta y los reemplazó
+  con exactamente 3 PRs agrupados (`nuget`, `npm`, `github-actions`) en
+  su siguiente ciclo, sin intervención manual.
+- **De esos 3 PRs agrupados, 2 fallan `CI` de verdad** (el paso
+  `Restore` de NuGet) — el bump agrupado de 25 paquetes NuGet y el de 6
+  paquetes npm introducen conflictos de versión reales, no un problema de
+  configuración (el PR de `github-actions`, sin tocar NuGet/npm, pasa
+  limpio). No se investigó el conflicto exacto línea por línea en este
+  documento — lectura de logs completos requiere permisos de administrador
+  sobre el repo que este entorno no tiene (`403 Must have admin rights`
+  al pedir `actions/jobs/{id}/logs` sin autenticación); el usuario sí
+  puede verlos desde la UI de GitHub. Es, en sí, la prueba de que el gate
+  de PR funciona: agarra bumps automáticos rotos antes de que lleguen a
+  `main`, que es exactamente para lo que existe.
+- **Sin verificar todavía**: `publish.yml` (CD) — necesita un primer
+  Release real, que a su vez necesita un commit `feat:`/`fix:` después
+  del commit inicial para que `release-please` tenga algo que versionar.
+  Branch protection sobre `main` (sección 3) — pendiente de que el
+  usuario la configure manualmente, mismo límite de acceso que el resto
+  de este documento.

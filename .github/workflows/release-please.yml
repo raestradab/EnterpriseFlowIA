@@ -16,7 +16,7 @@ jobs:
       # F13.5 (Release 4): reads Conventional Commits (CONTRIBUTING.md) since the last release,
       # keeps a PR open with the computed next SemVer version + CHANGELOG.md entry, and cuts the
       # tag + GitHub Release with generated notes once that PR is merged.
-      - uses: googleapis/release-please-action@v4
+      - uses: googleapis/release-please-action@v5
         with:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json

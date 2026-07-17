@@ -27,22 +27,22 @@ jobs:
         # src/EnterpriseFlow.Web (TypeScript/Vue).
         language: ["csharp", "javascript-typescript"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: github/codeql-action/init@v3
+      - uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
 
       # C# is compiled — CodeQL needs a real build to extract from, not just source text.
       # javascript-typescript needs none (CodeQL parses .ts/.vue directly).
       - if: matrix.language == 'csharp'
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: "8.0.x"
 
       - if: matrix.language == 'csharp'
         run: dotnet build EnterpriseFlow.slnx --configuration Release
 
-      - uses: github/codeql-action/analyze@v3
+      - uses: github/codeql-action/analyze@v4
         with:
           category: "/language:${{ matrix.language }}"

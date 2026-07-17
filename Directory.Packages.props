@@ -9,36 +9,36 @@
     <PackageVersion Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
 
     <!-- Application -->
-    <PackageVersion Include="MediatR" Version="12.4.1" />
-    <PackageVersion Include="FluentValidation" Version="11.10.0" />
-    <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="11.10.0" />
+    <PackageVersion Include="MediatR" Version="14.2.0" />
+    <PackageVersion Include="FluentValidation" Version="12.1.1" />
+    <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <!-- Lean, framework-independent package for IDistributedCache only (CachingBehavior,
          ADR-0012) — not a FrameworkReference to Microsoft.AspNetCore.App, which would pull the
          whole ASP.NET Core runtime surface into Application for the sake of one interface. -->
-    <PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="10.0.10" />
     <!-- Lean, framework-independent package for IOptions<T> only (DocumentValidationOptions,
          HU-051) — same reasoning as the caching abstractions above. -->
-    <PackageVersion Include="Microsoft.Extensions.Options" Version="8.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Options" Version="10.0.10" />
     <!-- Lean, framework-independent package for ILogger<T> only (IndexDocumentOnUploadHandler,
          Release 3 Sprint 7b) — first place Application needs to log a caught exception instead
          of silently swallowing it; same reasoning as the caching/options abstractions above. -->
-    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.10" />
 
     <!-- Infrastructure -->
-    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="8.0.10" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.10" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10" />
-    <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="7.1.2" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="9.0.18" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.18" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.18" />
+    <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.19.2" />
     <!-- Release 2 (ADR-0008): Redis activated for F8.2 (Catálogos) cache-aside. -->
-    <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.10" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.10" />
     <!-- Release 2 (ADR-0008): Hangfire activated for F6.2 (envío de correo asíncrono). -->
     <PackageVersion Include="Hangfire.AspNetCore" Version="1.8.14" />
-    <PackageVersion Include="Hangfire.SqlServer" Version="1.8.14" />
+    <PackageVersion Include="Hangfire.SqlServer" Version="1.8.24" />
     <!-- Release 2 (F5, ADR-0009): los 4 SDKs reales de proveedores de Documentos —
          intercambiables por configuración, uno activo por instancia (DependencyInjection.cs). -->
-    <PackageVersion Include="Azure.Storage.Blobs" Version="12.22.2" />
-    <PackageVersion Include="AWSSDK.S3" Version="3.7.412.1" />
-    <PackageVersion Include="Google.Cloud.Storage.V1" Version="4.10.0" />
+    <PackageVersion Include="Azure.Storage.Blobs" Version="12.29.1" />
+    <PackageVersion Include="AWSSDK.S3" Version="4.0.101.3" />
+    <PackageVersion Include="Google.Cloud.Storage.V1" Version="4.15.0" />
     <!-- Release 3 (F9/F10, ADR-0013): SDK oficial de OpenAI (chat + embeddings). Anthropic no
          tiene un SDK oficial de .NET — su cliente se implementa contra la REST API (Messages)
          directamente con HttpClient, sin un paquete de terceros no mantenido por Anthropic. -->
@@ -63,23 +63,23 @@
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
 
     <!-- Api -->
-    <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.9.0" />
-    <PackageVersion Include="Serilog.AspNetCore" Version="8.0.3" />
-    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.10" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.2.3" />
+    <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.29" />
 
     <!-- Tests (comunes) -->
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
-    <PackageVersion Include="coverlet.collector" Version="6.0.2" />
-    <PackageVersion Include="xunit" Version="2.9.2" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
-    <PackageVersion Include="FluentAssertions" Version="6.12.1" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
+    <PackageVersion Include="coverlet.collector" Version="10.0.1" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <PackageVersion Include="FluentAssertions" Version="8.10.0" />
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="NetArchTest.Rules" Version="1.3.2" />
-    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.10" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.29" />
     <!-- SQLite (not the EF Core "InMemory" provider) for integration tests: it goes through
          real SQL translation, so global query filters (ADR-0003) are exercised faithfully —
          Microsoft's own docs advise against InMemory for anything query-shape-sensitive. -->
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.10" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.18" />
   </ItemGroup>
 
 </Project>
